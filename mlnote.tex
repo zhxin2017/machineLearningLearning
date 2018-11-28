@@ -1,0 +1,218 @@
+\documentclass[UTF8]{ctexart}
+\title{机器学习笔记}
+\author{张鑫}
+\date{}
+\usepackage{amsmath}
+\DeclareMathOperator{\tr}{tr}
+\newtheorem{theorem}{定理}[section]
+\begin{document}
+	
+	\maketitle
+
+	\section{概论}
+	\subsection{统计学习三要素}
+	统计学习三要素：模型、策略、算法. 在监督学习过程中，模型就是所要学习的条件概率分布或决策函数. 模型的假设空间包含所有可能的条件概率分布或决策函数. 统计学习的目标在于从假设空间中选取最优模型. 监督学习的两个基本策略：经验风险最小化和结构风险最小化. 统计学习的算法为求解最优化问题的算法.
+
+	\subsection{模型评估与模型选择}
+	
+	\subsection{机器学习的可能性}
+	\subsubsection{Hoeffding不等式}
+	
+	\section{线性回归}
+	
+	\subsection{Cost Function}
+	\begin{equation*}
+		h_\theta(x)=\theta^Tx
+	\end{equation*}
+
+	Assume: 
+	\begin{equation*}
+		y^{(i)}=\theta^Tx^{(i)}+\epsilon^{(i)}
+	\end{equation*}
+	where $\epsilon^{(i)}$ is an error term. Further assume $\epsilon^{(i)}$ is i.i.d. and with a Gaussian distribution of mean 0 and variance $\sigma^2$:
+	\begin{equation*}
+		p(\epsilon^{(i)}) = \frac{1}{\sqrt{2\pi}\sigma}e^{-\frac{(\epsilon^{(i)})^2}{2\sigma^2}}
+	\end{equation*}
+	This implies that
+	\begin{equation*}
+		p(y^{(i)}|x^{(i)};\theta) = \frac{1}{\sqrt{2\pi}\sigma}e^{-\frac{(y^{(i)}-\theta^Tx^{(i)})^2}{2\sigma^2}}
+	\end{equation*}
+	Likelihood function:
+	\begin{equation*}
+	\begin{aligned}
+		L(\theta) & = L(\theta;X,y) = p(y|X;\theta) \\
+		& = \prod_{i=1}^{m}p(y^{(i)}|x^{(i)};\theta) \\
+		& = \prod_{i=1}^{m}\frac{1}{\sqrt{2\pi}\sigma}e^{-\frac{(y^{(i)}-\theta^Tx^{(i)})^2}{2\sigma^2}}
+	\end{aligned}
+	\end{equation*}
+	Log likelihood:
+	\begin{equation*}
+	\begin{aligned}
+		l(\theta) & = log(L(\theta)) \\
+		& = log(\prod_{i=1}^{m}\frac{1}{\sqrt{2\pi}\sigma}e^{-\frac{(y^{(i)}-\theta^Tx^{(i)})^2}{2\sigma^2}}) \\
+		& = \sum_{i=1}^{m}log(\frac{1}{\sqrt{2\pi}\sigma}e^{-\frac{(y^{(i)}-\theta^Tx^{(i)})^2}{2\sigma^2}})
+	\end{aligned}
+	\end{equation*}
+	对数似然函数最大化等价于最小化如下 cost function:
+	\begin{equation*}
+		J(\theta)=\frac{1}{2}\sum_{i=1}^{m}(y^{(i)}-h_\theta(x^{(i)}))^2
+	\end{equation*}
+	\subsection{LMS algorithm}
+	只有一个训练样本$(x,y)$时的导数：
+	\begin{equation*}
+	\begin{aligned}
+	\frac{\partial}{\partial\theta_j}J(\theta) & =\frac{\partial}{\partial\theta_j}\frac{1}{2}(y-h_\theta(x))^2 \\
+	& =(h_\theta(x)-y)\frac{\partial}{\partial\theta_j}(\sum_{i=0}^{n}\theta_ix_i-y)\\
+	& =(h_\theta(x)-y)x_j
+	\end{aligned}
+	\end{equation*}
+	相应的更新规则：
+	\begin{equation*}
+		\theta_j:=\theta_j-\alpha(h_\theta(x^{(i)})-y^i)x^{(i)}_j
+	\end{equation*}
+	多个样本的更新规则(Batch gradient descent)：
+	\begin{equation*}
+			\theta_j:=\theta_j-\alpha\sum_{i=0}^{n}(h_\theta(x^{(i)})-y^i)x^{(i)}_j
+	\end{equation*}
+	
+	\subsection{Matrix derivatives}
+	迹技巧：
+	If $A$ and $B$ are square matrices and $a$ is a real number,
+	\begin{equation*}
+	\begin{aligned}
+	\tr AB&=\tr BA \\
+	\tr A&=\tr A^T \\
+	\tr (A+B)&=\tr A + \tr B \\
+	\tr aA &= a\tr A 
+	\end{aligned}	
+	\end{equation*}
+	
+	Matrix derivatives:
+	\begin{equation*}
+	\begin{aligned}
+	\nabla_A\tr AB & =B^T\\
+	\nabla_{A^T}f(A) & =(\nabla_Af(A))^T\\
+	\nabla_A\tr ABA^TC & =CAB+C^TAB^T\\
+	\nabla_A{|A|}&=|A|(A^{-1})^T
+	\end{aligned}	
+	\end{equation*}
+	
+	Normal equations:
+	\begin{equation*}
+		\theta = (X^TX)^{-1}X^Ty
+	\end{equation*}
+	
+	\section{Logistic Regression}
+	\begin{equation*}
+		h_\theta(x)=g(\theta^Tx)=\frac{1}{1+e^{-\theta^Tx}},
+	\end{equation*}
+	where
+	\begin{equation*}
+		g(z)=\frac{1}{1+e^{-z}}
+	\end{equation*}
+	\begin{equation*}
+		g'(z)=g(z)(1-g(z))
+	\end{equation*}
+	Assume that	
+	\begin{equation*}
+	\begin{aligned}
+	P(y=1|x;\theta) & =h_\theta(x) \\
+	P(y=0|x;\theta) & =1-h_\theta(x)
+	\end{aligned}
+	\end{equation*}
+	等同于
+	\begin{equation*}
+		p(y|x;\theta)=(h_\theta(x))^y(1-h_\theta(x))^{(1-y)}
+	\end{equation*}
+	Assuming that the m training examples were generated independently, then the likelihood of the parameters is
+	\begin{equation*}
+		L(\theta) = \prod_{i=i}^{m}(h_\theta(x^{(i)}))^{y^{(i)}}(1-h_\theta(x^{(i)}))^{(1-y^{(i)})}
+	\end{equation*}
+	The log likelihood is
+	\begin{equation*}
+		l(\theta) = \sum_{i=i}^{m}\log((h_\theta(x^{(i)}))^{y^{(i)}}(1-h_\theta(x^{(i)}))^{(1-y^{(i)})})
+	\end{equation*}
+	定义损失函数
+	\begin{equation*}
+	\begin{aligned}
+		J(\theta) &=-l(\theta) \\
+		& = \sum_{i=i}^{m}-\log((h_\theta(x^{(i)}))^{y^{(i)}}(1-h_\theta(x^{(i)}))^{(1-y^{(i)})}) \\
+		& = \sum_{i=i}^{m}-y^{(i)}\log((h_\theta(x^{(i)}))-(1-y^{(i)})\log(1-h_\theta(x^{(i)}))
+	\end{aligned}
+	\end{equation*}
+	导数为
+	\begin{equation*}
+	\begin{aligned}
+	\frac{\partial J(\theta)}{\partial \theta_j} & = \sum_{i=1}^{m}-y^{(i)}\frac{h_\theta(x^{(i)})(1-h_\theta(x^{(i)}))}{h_\theta(x^{(i)})}x_j^{(i)}-(1-y^{(i)})\frac{-h_\theta(x^{(i)})(1-h_\theta(x^{(i)}))}{1-h_\theta(x^{(i)})}x_j^{(i)} \\
+	& =\sum_{i=1}^{m}(-y^{(i)}(1-h_\theta(x^{(i)}))+(1-y^{(i)})h_\theta(x^{(i)}))x_j^{(i)} \\
+	& =\sum_{i=1}^{m}(h_\theta(x^{(i)})-y^{(i)})x_j^{(i)}
+	\end{aligned}
+	\end{equation*}
+	多个样本的更新规则(\emph{和线性回归更新规则相同})：
+	\begin{equation*}
+	\theta_j:=\theta_j-\alpha\sum_{i=0}^{n}(h_\theta(x^{(i)})-y^i)x^{(i)}_j
+	\end{equation*}
+	
+	
+	\section{广义线性模型}
+	The exponential family:
+	\begin{equation*}
+		p(y;\eta)=b(y)\exp(\eta^TT(y)-a(\eta))
+	\end{equation*}
+	$\eta$ is the \emph{natural parameter}(or \emph{canonical parameter}); $T(y)$ is the \emph{sufficient statistic}; $a(\eta)$ is the \emph{log partition function}.
+	
+	
+	\section{感知机}
+	\subsection{感知机学习策略}
+
+	感知机是一种线性分类模型，属于判别模型。
+	
+	假设训练数据集线性可分，输入空间$R^n$中任一点到超平面$S$的距离为：
+	\[
+		-\frac{1}{\|w\|}y_i(w^T\cdot{x_i}+b)
+	\]
+	
+	假设超平面$S$的误分类点所有误分类点到超平面$S$的总距离为：
+	\[
+		-\frac{1}{\|w\|}\sum_{x_i\in{M}}y_i(w^T\cdot{x_i}+b)
+	\]
+	
+	不考虑$\frac{1}{\|w\|}$,得到感知机学习的损失函数：
+	\[
+		L(w,b)=-\sum_{x_i\in{M}}y_i(w^T\cdot{x_i}+b)
+	\]
+	
+	\subsection{感知机学习算法}
+	\subsubsection{算法的收敛性}
+	\begin{theorem}
+		设训练数据集$T=\{(x_1,y_1),(x_2,y_2),\dots,(x_N,y_N)\}$是线性可分的，则
+		
+		（1）存在满足条件$\|\hat{w}_{opt}\|=1$的超平面将T完全正确分开；且存在$\gamma>0$，对所有$i=1,2,\dots,N$
+		\[
+			y_i(\hat{w}_{opt}\cdot\hat{x}_i)=y_i(w_{opt}\cdot x_i+b_{opt})\geq\gamma
+		\]
+		
+		（2） 令$R=\max\limits_{1\leq i \leq N}\|\hat{x}_i\|$,则感知机算法在$T$上的误分类次数$k$满足不等式
+		\[
+			k\leq(\frac{R}{\gamma})^2
+		\]
+	\end{theorem}
+
+	\section{Support Vector Machine}
+	\begin{equation*}
+		h_{w, b}(x) = g(w^Tx + b).
+	\end{equation*}
+	Here, $g(z)=1$ if $z>0$, and $g(z)=-1$ otherwise.
+	
+	Functional margin with respect to the training example $(x^{(i)}, y^{(i)})$:
+	\begin{equation*}
+		\hat{\gamma}^{(i)} = y^{(i)}(w^Tx^{(i)} + b)
+	\end{equation*}
+	
+	Define the function margin of $(w, b)$ with respect to training set to be the smallest of the functional margins of the individual training examples:
+	\begin{equation*}
+		\hat{\gamma} = \min_{i=1,\cdots,m}\hat{\gamma}^{(i)}
+	\end{equation*}
+	
+	
+\end{document}
