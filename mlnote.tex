@@ -5,6 +5,7 @@
 \usepackage{amsmath}
 \DeclareMathOperator{\tr}{tr}
 \newtheorem{theorem}{定理}[section]
+\newtheorem{proof}{证明}[section]
 \begin{document}
 	
 	\maketitle
@@ -75,7 +76,7 @@
 			\theta_j:=\theta_j-\alpha\sum_{i=0}^{n}(h_\theta(x^{(i)})-y^i)x^{(i)}_j
 	\end{equation*}
 	
-	\subsection{Matrix derivatives}
+	\subsection{Norm Equations}
 	迹技巧：
 	If $A$ and $B$ are square matrices and $a$ is a real number,
 	\begin{equation*}
@@ -89,15 +90,88 @@
 	
 	Matrix derivatives:
 	\begin{equation*}
-	\begin{aligned}
-	\nabla_A\tr AB & =B^T\\
-	\nabla_{A^T}f(A) & =(\nabla_Af(A))^T\\
-	\nabla_A\tr ABA^TC & =CAB+C^TAB^T\\
-	\nabla_A{|A|}&=|A|(A^{-1})^T
-	\end{aligned}	
+		\nabla_A\tr AB =B^T
+	\end{equation*}	
+	\begin{equation*}
+		\nabla_{A^T}f(A) =(\nabla_Af(A))^T
 	\end{equation*}
-	
-	Normal equations:
+	\begin{equation*}
+		\nabla_A\tr ABA^TC =CAB+C^TAB^T
+	\end{equation*}
+	\begin{proof}
+		假设$A$是$m\times n$, $B$是$n\times n$, $C$是$m\times m$，则
+		\begin{equation*}
+		\begin{aligned}
+			\tr ABA^TC & = \sum_{i=1}^{m}(ABA^TC)_{ii} \\
+			& = \sum_{i=1}^{m}\sum_{j=1}^{m}(ABA^T)_{ij}C_{ji} \\
+			& = \sum_{i=1}^{m}\sum_{j=1}^{m}\sum_{k=1}^{n}(AB)_{ik}A^T_{kj}C_{ji} \\
+			& = \sum_{i=1}^{m}\sum_{j=1}^{m}\sum_{k=1}^{n}\sum_{p=1}^{n}A_{ip}B_{pk}A^T_{kj}C_{ji} \\
+			& = \sum_{i=1}^{m}\sum_{j=1}^{m}\sum_{k=1}^{n}\sum_{p=1}^{n}A_{ip}B_{pk}A_{jk}C_{ji}
+		\end{aligned}
+		\end{equation*}
+		\begin{equation*}
+		\begin{aligned}
+			\frac{\partial\tr ABA^TC}{\partial A_{mn}} & = \frac{\partial(\sum\limits_{i=1}^{m}\sum\limits_{j=1}^{m}\sum\limits_{k=1}^{n}\sum\limits_{p=1}^{n}A_{ip}B_{pk}A_{jk}C_{ji})}{\partial A_{mn}} \\
+			& = \sum\limits_{k=1}^{n}\sum\limits_{j=i}^{m}B_{nk}A_{jk}C_{jm}+\sum\limits_{p=1}^{n}\sum\limits_{i=1}^{m}A_{ip}B_{pn}C_{mi} \\
+			& = \sum\limits_{j=1}^{m}\sum\limits_{k=1}^{n}B_{nk}A^T_{kj}C_{jm}+\sum\limits_{i=1}^{m}\sum\limits_{p=1}^{n}A_{ip}B_{pn}C_{mi} \\
+			& = \sum\limits_{j=1}^{m}(BA^T)_{nj}C_{jm}+\sum\limits_{i=1}^{m}(AB)_{in}C_{mi} \\
+			& = \sum\limits_{j=1}^{m}C^T_{mj}(AB^T)_{jn}+(ABC)_{mn} \\
+			& = (C^TAB^T)_{mn} + (ABC)_{mn}
+		\end{aligned}
+		\end{equation*}
+		则
+		\begin{equation*}
+			\nabla_A\tr ABA^TC = C^TAB^T + ABC
+		\end{equation*}
+	\end{proof}
+	\begin{equation*}
+		\nabla_A{|A|} = |A|(A^{-1})^T
+	\end{equation*}
+	\begin{proof}
+		\begin{equation*}
+		\begin{aligned}
+		\frac{\partial |A|}{\partial A_{mn}} & = \frac{\partial \sum\limits_{i=1}^{n}A_{in}C_{in}}{\partial A_{mn}} \\
+		& = C_{mn}
+		\end{aligned}
+		\end{equation*}
+		其中，$C$为$A$的余子矩阵. 又因为
+		\begin{equation*}
+			AC^T = (\det A) I,
+		\end{equation*}
+		\begin{equation*}
+			C = (\det A) (A^{-1})^T, 
+		\end{equation*}
+		则
+		\begin{equation*}
+			\nabla_A{|A|} = |A|(A^{-1})^T 
+		\end{equation*}
+	\end{proof}
+
+	\begin{equation*}
+		X\theta - y = 
+		\left[
+			\begin{matrix}
+			h_\theta(x^{(1)})-y^{(1)} \\
+			h_\theta(x^{(2)})-y^{(2)} \\
+			\vdots \\
+			h_\theta(x^{(m)})-y^{(m)} \\
+			\end{matrix}
+		\right]
+	\end{equation*}
+	\begin{equation*}
+		J(\theta) = \frac{1}{2} (X\theta - y)^T(X\theta - y)
+	\end{equation*}
+	\begin{equation*}
+		\begin{aligned}
+			\nabla_\theta J(\theta) & = \frac{1}{2} \nabla_\theta (X\theta - y)^T(X\theta - y) \\
+			& = \frac{1}{2}\nabla_\theta (\theta^TX^TX\theta-\theta^TX^Ty-y^TX\theta+y^Ty) \\
+			& = \frac{1}{2}((\nabla_{\theta^T} \theta^T(X^TX)\theta I)^T-(\nabla_{\theta^T} \theta^TX^Ty)^T -(\nabla_{\theta^T} y^TX\theta)^T) \\
+			& = \frac{1}{2}((\nabla_{\theta^T} \tr \theta^T(X^TX)\theta I)^T-(\nabla_{\theta^T} \tr \theta^TX^Ty)^T -(\nabla_{\theta^T} \tr \theta^TX^Ty)^T) \\
+			& = \frac{1}{2}((\theta^TX^TX + \theta^TX^TX)^T - X^Ty - X^Ty) \\
+			& = X^TX\theta - X^Ty
+		\end{aligned}		
+	\end{equation*}
+	令$\nabla_\theta J(\theta)=0$, 则可得到 normal equation:
 	\begin{equation*}
 		\theta = (X^TX)^{-1}X^Ty
 	\end{equation*}
